@@ -2,6 +2,8 @@
 
 このリポジトリは、作ったWebゲームを置いておく場所 TsumikiKichi (つみききち) のテンプレート集です。
 
+https://tsumiki-kichi.com
+
 ## Unity
 
 **📁 フォルダ**: 
