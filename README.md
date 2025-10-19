@@ -106,6 +106,8 @@ TsumikiKichi（つみききち）は個人で開発しているため、各種�
 - 録画機能の改善
 - README改善
 
+詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) をご覧ください。
+
 Issue での提案や質問もお気軽にどうぞ。
 
 ---
