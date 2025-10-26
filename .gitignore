@@ -49,3 +49,6 @@ yarn.lock
 # Godot
 .import/
 export_presets.cfg
+
+# claude
+.claude

@@ -17,8 +17,8 @@ UNITY_TARGETS=(
 
 # Godot: インライン化するファイルのリスト
 GODOT_TARGETS=(
-  "Godot/no_fullscreen/index.html"
-  "Godot/with_fullscreen/index.html"
+  "Godot4/no_fullscreen/index.html"
+  "Godot4/with_fullscreen/index.html"
 )
 
 echo "🔄 Syncing tsumiki-capture.js from shared/..."
@@ -56,62 +56,41 @@ echo ""
 # ==========================================
 echo "📦 Godot templates (inline script):"
 
-# JavaScriptファイルの内容を読み込み
-JS_CONTENT=$(cat "$SHARED_JS")
-
 for target in "${GODOT_TARGETS[@]}"; do
   if [ ! -f "$target" ]; then
     echo "⚠️  Warning: File not found: $target"
     continue
   fi
-  
+
   # マーカー間のスクリプトを置き換え
-  # 一時ファイルを使用
-  temp_file="${target}.tmp"
-  
-  # Perlを使ってマーカー間を置き換え（awkより改行処理が安定）
-  perl -i.bak -pe '
-    BEGIN {
-      # JavaScriptファイルの内容を読み込み
-      open(my $js_fh, "<", "'"$SHARED_JS"'") or die "Cannot open '"$SHARED_JS"': $!";
-      local $/;
-      $js_content = <$js_fh>;
-      close($js_fh);
-      $in_block = 0;
-    }
-    
-    if (/<!-- START: TsumikiKichi Video Capture Script -->/) {
-      # インデントを検出
-      /^(\s*)/;
-      $indent = $1;
-      
-      # マーカーと開始タグを出力
-      print;
-      print "${indent}<!-- This section is automatically updated by sync-shared.sh -->\n";
-      print "${indent}<script>\n";
-      
-      # JavaScriptの内容を行ごとに出力
-      foreach my $line (split(/\n/, $js_content)) {
-        print "${indent}$line\n";
-      }
-      
-      print "${indent}</script>\n";
-      
-      $in_block = 1;
-      $_ = "";  # 現在行をスキップ
-    }
-    elsif (/<!-- END: TsumikiKichi Video Capture Script -->/) {
-      $in_block = 0;
-      # ENDマーカーは出力
-    }
-    elsif ($in_block) {
-      $_ = "";  # ブロック内の既存内容をスキップ
-    }
-  ' "$target"
-  
-  # バックアップファイルを削除
-  rm -f "${target}.bak"
-  
+  # インデントを検出
+  INDENT=$(grep "<!-- START: TsumikiKichi Video Capture Script -->" "$target" | sed 's/<!-- START: TsumikiKichi Video Capture Script -->.*//')
+
+  # 一時ファイルを作成
+  TEMP_FILE=$(mktemp)
+
+  # マーカーの前の部分を出力
+  sed -n '1,/<!-- START: TsumikiKichi Video Capture Script -->/p' "$target" | sed '$d' > "$TEMP_FILE"
+
+  # 新しいスクリプトセクションを出力
+  echo "${INDENT}<!-- START: TsumikiKichi Video Capture Script -->" >> "$TEMP_FILE"
+  echo "${INDENT}<!-- This section is automatically updated by sync-shared.sh -->" >> "$TEMP_FILE"
+  echo "${INDENT}<script>" >> "$TEMP_FILE"
+
+  # JavaScriptファイルの内容を各行にインデントを追加して出力
+  while IFS= read -r line; do
+    echo "${INDENT}$line" >> "$TEMP_FILE"
+  done < "$SHARED_JS"
+
+  echo "${INDENT}</script>" >> "$TEMP_FILE"
+  echo "${INDENT}<!-- END: TsumikiKichi Video Capture Script -->" >> "$TEMP_FILE"
+
+  # マーカーの後の部分を出力
+  sed -n '/<!-- END: TsumikiKichi Video Capture Script -->/,$p' "$target" | sed '1d' >> "$TEMP_FILE"
+
+  # 元のファイルを置き換え
+  mv "$TEMP_FILE" "$target"
+
   echo "  ✓ $target (inlined)"
 done
 

@@ -11,14 +11,12 @@
  * 
  * Usage for Unity:
  * 1. Add class="tsumiki-kichi-canvas" to Canvas element
- * 2. Load this script with <script src="TemplateData/tsumiki-capture.js"></script>
- * 
+ * 2. Load this script: <script src="TemplateData/tsumiki-capture.js"><\/script>
+ *
  * Usage for Godot:
  * 1. Add class="tsumiki-kichi-canvas" to Canvas element
- * 2. Copy entire script content between markers in index.html:
- *    <!-- START: TsumikiKichi Video Capture Script -->
- *    <script> (paste script here) </script>
- *    <!-- END: TsumikiKichi Video Capture Script -->
+ * 2. Copy entire script content between markers in index.html
+ *    Script tags are automatically added by sync-shared.sh
  * 
  * Security Model:
  * - This script is included in game files and can be modified by uploaders
@@ -39,7 +37,72 @@
   let mediaRecorder = null;
   let recordedChunks = [];
   let captureCompleted = false; // Prevent multiple captures
+  let recordingIndicator = null; // Recording indicator element
   
+  /**
+   * Show recording indicator
+   */
+  function showRecordingIndicator() {
+    if (recordingIndicator) return; // Already showing
+
+    recordingIndicator = document.createElement('div');
+    recordingIndicator.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(220, 38, 38, 0.9);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+    `;
+
+    // Red dot
+    const dot = document.createElement('span');
+    dot.style.cssText = `
+      width: 8px;
+      height: 8px;
+      background-color: white;
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    `;
+
+    // Add pulsing animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    recordingIndicator.appendChild(dot);
+    recordingIndicator.appendChild(document.createTextNode('REC'));
+
+    document.body.appendChild(recordingIndicator);
+    console.log('[TsumikiCapture] Recording indicator shown');
+  }
+
+  /**
+   * Hide recording indicator
+   */
+  function hideRecordingIndicator() {
+    if (recordingIndicator && recordingIndicator.parentNode) {
+      recordingIndicator.parentNode.removeChild(recordingIndicator);
+      recordingIndicator = null;
+      console.log('[TsumikiCapture] Recording indicator hidden');
+    }
+  }
+
   /**
    * Notify parent that initialization is complete
    */
@@ -190,6 +253,9 @@
       // Start recording
       mediaRecorder.start();
       console.log('[TsumikiCapture] Recording started');
+
+      // Show recording indicator
+      showRecordingIndicator();
       
       // Stop after specified duration
       setTimeout(() => {
@@ -201,6 +267,7 @@
       
     } catch (error) {
       console.error('[TsumikiCapture] Capture failed:', error);
+      hideRecordingIndicator(); // Hide indicator on error
       captureCompleted = true; // Mark as completed on error to prevent retry
     }
   }
@@ -209,6 +276,9 @@
    * Handle capture completion
    */
   function handleCaptureComplete(stream) {
+    // Hide recording indicator
+    hideRecordingIndicator();
+
     // Stop stream
     stream.getTracks().forEach(track => track.stop());
     
