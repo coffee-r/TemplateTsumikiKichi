@@ -9,16 +9,16 @@ https://tsumiki-kichi.com
 **📁 フォルダ**: [`Unity/WebGLTemplates/`](./Unity/WebGLTemplates/)
 
 このフォルダには2つのテンプレートが含まれています：
-- **TsumikiKichiWithFullscreen** - フルスクリーンボタン付き
-- **TsumikiKichiNoFullscreen** - フルスクリーンボタンなし
+- **TsumikiWithFullscreen** - フルスクリーンボタン付き
+- **TsumikiNoFullscreen** - フルスクリーンボタンなし
 
 ### 使用方法
 
 1. [`Unity/WebGLTemplates/`](./Unity/WebGLTemplates/) フォルダをダウンロード
 2. Unityプロジェクトの `Assets/` 配下に配置（フォルダ名は `WebGLTemplates` のまま）
 3. `Player Settings > WebGL > Resolution and Presentation > WebGL Template` で使いたいテンプレートを選択
-   - **TsumikiKichiWithFullscreen** - フルスクリーンボタンあり
-   - **TsumikiKichiNoFullscreen** - フルスクリーンボタンなし
+   - **TsumikiWithFullscreen** - フルスクリーンボタンあり
+   - **TsumikiNoFullscreen** - フルスクリーンボタンなし
 4. WebGLビルドを実行
 
 ---
