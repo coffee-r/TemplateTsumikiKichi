@@ -1,5 +1,54 @@
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# Sync script backup files
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+
+# Log files
+*.log
+
+# Node.js (将来的に使う可能性があるため)
+node_modules/
+package-lock.json
+yarn.lock
 
 # Unity
 *.meta
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
 
+# Godot
+.import/
+export_presets.cfg
+
+# claude
+.claude
